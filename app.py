@@ -17,25 +17,22 @@ db.init_app(app)
 
 api_key = os.getenv("API_KEY")
 
-url = "https://api.spoonacular.com/recipes/complexSearch"
+def search_recipes(query):
+    url = "https://api.spoonacular.com/recipes/complexSearch"
 
-params = {
-    "apiKey": api_key,
-    "includeNutrition": "false",
-    "number": "5"
-}
+    params = {
+        "apiKey": api_key,
+        "query": query,
+        "number": 5
+    }
 
-response = requests.get(url, params=params)
-
-# print(response.json())
-
-#https://api.spoonacular.com/recipes/716429/information?apiKey={api_key}&includeNutrition=true
-
+    response = requests.get(url, params=params)
+    return response.json()
 
 @app.route("/")
 def home():
     data = search_recipes("chicken")
-    return render_template("results.html", recipes=data["results"])
+    return render_template("home.html", recipes=data["results"])
 
 
 # @app.route("/my-recipes")
@@ -43,8 +40,6 @@ def home():
 #     recipes = Recipe.query.all()
 #     return render_template("home.html", recipes = recipes)
 
-print(response.status_code)
-print(response.text)
 
 if __name__ == '__main__':
     app.run(debug=True)

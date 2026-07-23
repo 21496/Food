@@ -2,8 +2,14 @@
 {% block content %}
     <h1>Search Recipes</h1>
 
-    <form method="GET" action="/">
-        <input type="text" name="q" placeholder="Search..." value="{{ query }}">
+    <h2 class="login">Log in</h2>
+
+    <form action="{{ url_for('home') }}" method="GET">
+        <input
+            type="text"
+            name="query"
+            value="{{ query }}"
+            placeholder="Search recipes">
         <button type="submit">Search</button>
     </form>
 

@@ -1,0 +1,25 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <h1>Search Recipes</h1>
+
+
+    <form action="{{ url_for('home') }}" method="GET">
+        <input
+            type="text"
+            name="query"
+            value="{{ query }}"
+            placeholder="Search recipes">
+        <button type="submit">Search</button>
+    </form>
+
+    <hr>
+
+    <h2>Results</h2>
+
+    {% for recipe in recipes %}
+        <div>
+            <h3>{{ recipe.title }}</h3>
+            <img src="{{ recipe.image }}" width="150">
+        </div>
+{% endfor %}
+{% endblock %}

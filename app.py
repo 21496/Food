@@ -62,7 +62,7 @@ def search_recipes(query):
     params = {
         "apiKey": api_key,
         "query": query,
-        "number": 5
+        "number": 20
     }
 
     response = requests.get(url, params=params)

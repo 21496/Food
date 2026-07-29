@@ -1,33 +1,32 @@
 {% extends 'layout.html' %}
 {% block content %}
+    <header class="navbar">
+        <div class="logo">
+            <a link href="/" class="title">Reciped</a>
+        </div>
 
-<body>
-    <h1>Login</h1>
+        <nav>
+            <a href="#">Browse</a>
+            <a href="#">Upload</a>
+            <a href="#">Favourites</a>
+            <a href="{{ url_for('login') }}" class="login-btn">Log in</a>
+        </nav>
+    </header>
 
-    {% with messages = get_flashed_messages() %}
-        {% if messages %}
-            {% for message in messages %}
-                <p>{{ message }}</p>
-            {% endfor %}
-        {% endif %}
-    {% endwith %}
+    <section class="login-box">
+        <h1>Welcome Back</h1>
+    </section>
 
     <form method="POST">
-        {{ form.hidden_tag() }}
         <p>
-            {{ form.username.label }}
-            <br>
-            {{ form.username() }}
+            {{ form.username(placeholder="Username") }}
         </p>
         <p>
-            {{ form.password.label }}
-            <br>
-            {{ form.password() }}
+            {{ form.password(placeholder="Password") }}
         </p>
         <p>
             {{ form.submit() }}
         </p>
     </form>
-</body>
 
 {% endblock %}

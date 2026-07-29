@@ -1,8 +1,19 @@
 {% extends 'layout.html' %}
 {% block content %}
-    <h1>Search Recipes</h1>
+    <header class="navbar">
+        <div class="logo">
+            <a link href="/" class="title">Reciped</a>
+        </div>
 
-    <h2 class="login">Log in</h2>
+        <nav>
+            <a href="#">Browse</a>
+            <a href="#">Upload</a>
+            <a href="#">Favourites</a>
+            <a href="{{ url_for('login') }}" class="login-btn">Log in</a>
+        </nav>
+    </header>
+
+    <h1>Search Recipes</h1>
 
     <form action="{{ url_for('home') }}" method="GET">
         <input

@@ -1,0 +1,34 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <header class="navbar">
+        <div class="logo">
+            <a link href="/" class="title">Reciped</a>
+        </div>
+
+        <nav>
+            <a href="#">Browse</a>
+            <a href="#">Upload</a>
+            <a href="#">Favourites</a>
+            <a href="{{ url_for('login') }}" class="login-btn">Log in</a>
+        </nav>
+    </header>
+
+    <div class="hero-card">
+        <div class="image-section">
+            <img src="{{ recipe.image }}">
+        </div>
+        <div class="info-section">
+            <h1>{{ recipe.title }}</h1>
+
+            <div class="recipe-info">
+                Mins
+                Servings
+                Likes
+            </div>
+            <button class="save-btn">
+                Save Recipe
+            </button>
+        </div>
+    </div>
+
+{% endblock %}

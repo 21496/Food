@@ -68,12 +68,33 @@ def search_recipes(query):
     response = requests.get(url, params=params)
     return response.json()
 
+
 @app.route("/")
 def home():
     query = request.args.get("query", "chicken")
     data = search_recipes(query)
     recipes = data.get("results", [])
     return render_template("home.html", recipes = recipes, query = query)
+
+
+
+@app.route("/recipe/<int:recipe_id>")
+def recipe(recipe_id):
+    recipe = get_recipe(recipe_id)
+    return render_template("recipe.html", recipe=recipe)
+
+def get_recipe(recipe_id):
+    url = f"https://api.spoonacular.com/recipes/{recipe_id}/information"
+
+    params = {
+        "apiKey": api_key,
+        "includeNutrition": False
+    }
+
+    response = requests.get(url, params=params)
+    return response.json()
+
+
 
 @app.route("/login", methods=["GET", "POST"])
 def login():

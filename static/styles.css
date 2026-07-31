@@ -17,6 +17,7 @@ body {
     color: white;
     text-decoration: none;
     font-size: 25px;
+    font-weight: 500;
 }
 
 .navbar {
@@ -48,7 +49,7 @@ nav a:hover {
     color: white;
 }
 
-.login-btn {
+.sidelogin-btn {
     padding: 10px 22px;
     border: 1px solid #5c5c5c;
     border-radius: 12px;
@@ -61,4 +62,283 @@ nav a:hover {
 .login-btn:hover {
     background: #454545;
     border-color: #7a7a7a;
+}
+
+/* Home page */
+
+.hero-container {
+    background-image:url("/static/images/Recipe\ main\ image.jpg");
+    width: 100%;
+    height: 420px;
+    overflow: hidden;
+    position: relative;
+    background-size:cover;
+    background-position:center;
+    display:flex;
+    align-items:center;
+    margin-bottom:40px;
+}
+
+.hero-container::before{
+    content:"";
+    position:absolute;
+    inset:0;
+    background:rgba(0,0,0,.35);
+}
+
+.hero-overlay{
+    position:relative;
+    z-index:2;
+    width:60%;
+    margin-left:60px;
+}
+
+.hero-overlay h1{
+    font-size:52px;
+    color:white;
+    margin-bottom:15px;
+    font-weight:700;
+}
+
+.search-form{
+    display:flex;
+    gap:15px;
+    max-width:700px;
+}
+
+.search-form input{
+    flex:1;
+    padding:18px 24px;
+    border:none;
+    border-radius:50px;
+    background:rgba(255,255,255,.95);
+    font-size:18px;
+    outline:none;
+}
+
+.recipe-cards {
+    margin-left: 30px;
+}
+
+
+/* Login page */
+.login-container{
+    width:475px;
+    margin:70px auto;
+    text-align:center;
+}
+
+.login-container h1{
+    font-size:46px;
+    font-weight:600;
+    margin-bottom:20px;
+}
+
+.subtitle{
+    color:#b6b6b6;
+    font-size:20px;
+    line-height:1.5;
+    margin-bottom:60px;
+}
+
+input{
+    width:100%;
+    background:transparent;
+    border:2px solid #4a4a4a;
+    color:white;
+    padding:18px 22px;
+    font-size:20px;
+    border-radius:12px;
+    margin-bottom:22px;
+    transition:.3s;
+}
+
+input::placeholder{
+    color:#e8e8e8;
+}
+
+input:focus{
+    outline:none;
+    border-color:#f26b2f;
+}
+
+.signup{
+    margin-top:25px;
+    color:#9c9c9c;
+    font-size:18px;
+}
+
+.signup a{
+    color:#f26b2f;
+    text-decoration:none;
+    font-weight:600;
+}
+
+.signup a:hover{
+    text-decoration:underline;
+}
+
+/* Recipe page */
+
+.hero-card{
+    display:flex;
+    gap:40px;
+    padding:30px;
+    margin-bottom:40px;
+}
+
+.image-section img{
+    width:360px;
+    height:260px;
+    object-fit:cover;
+    border-radius:15px;
+}
+
+.info-section{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+}
+
+.info-section h1{
+    font-size:42px;
+    margin-bottom:20px;
+}
+
+.recipe-info{
+    display:flex;
+    gap:15px;
+    flex-wrap:wrap;
+    margin-bottom:20px;
+}
+
+.recipe-info span{
+    background:#3c3c3c;
+    padding:10px 18px;
+    border-radius:10px;
+    font-weight:bold;
+}
+
+.summary{
+    color:#ddd;
+    line-height:1.8;
+    margin-bottom:30px;
+}
+
+.save-btn{
+    width:220px;
+    padding:15px;
+    border:none;
+    border-radius:10px;
+    background:#ff6b35;
+    color:white;
+    font-size:18px;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.save-btn:hover{
+    background:#ff8759;
+}
+
+
+.recipe-section{
+    margin-top:50px;
+}
+
+.ingredients{
+    padding-left:30px;
+    margin-bottom:50px;
+    
+}
+
+.ingredients h2{
+    font-size:32px;
+    color:white;
+    margin-bottom:25px;
+    font-weight:600;
+}
+
+.ingredients ul{
+    list-style:none;
+    padding:0;
+    border-top:1px solid #444;
+}
+
+.ingredients li{
+    padding:18px 18px;
+    border-bottom:1px solid #444;
+    color:#ddd;
+    font-size:18px;
+    display:flex;
+    align-items:center;
+}
+
+.ingredients li::before{
+    content:"■";
+    color:#ff6b35;
+    font-size:10px;
+    margin-right:15px;
+}
+
+.method{
+    padding-left:30px;
+}
+
+.method h2{
+    color:#ff6b35;
+    font-size:32px;
+    margin-bottom:30px;
+    font-weight:600;
+    border-bottom:2px solid #444;
+    padding-bottom:12px;
+}
+
+
+.method ol{
+    list-style:none;
+    padding:0;
+    counter-reset:step;
+}
+
+
+
+.method li{
+    counter-increment:step;
+    display:flex;
+    align-items:flex-start;
+    gap:20px;
+    background:#2c2c2c;
+    border-radius:15px;
+    padding:20px;
+    margin-bottom:20px;
+    color:#ddd;
+    line-height:1.8;
+    box-shadow:0 3px 8px rgba(0,0,0,.2);
+}
+
+/* 404 page */
+
+.error-container { 
+    font-family: sans-serif;
+    text-align: center;
+    padding: 50px;
+    background-color: #2f2f2f; 
+}
+
+h1 { 
+    font-size: 50px;
+    color: #f2f2f2;
+}
+
+p { 
+    font-size: 20px;
+    color: #666;
+}
+
+a { 
+    color: #ff6b35;
+    text-decoration: none;
+    font-weight: bold;
 }

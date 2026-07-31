@@ -6,27 +6,28 @@
         </div>
 
         <nav>
-            <a href="#">Browse</a>
-            <a href="#">Upload</a>
-            <a href="#">Favourites</a>
-            <a href="{{ url_for('login') }}" class="login-btn">Log in</a>
+            <a href="">Browse</a>
+            <a href="">Upload</a>
+            <a href="">Favourites</a>
+            <a href="{{ url_for('login') }}" class="sidelogin-btn">Log in</a>
         </nav>
     </header>
 
-    <section class="login-box">
-        <h1>Welcome Back</h1>
-    </section>
+    <div class="login-container">
+        <form method="POST" class="login-form">
+            {{ form.hidden_tag() }}
+            <h1>Welcome Back</h1>
+            
+            <p class="subtitle">Log in to save favourites and share your reipces</p>
+            <p>{{ form.username(placeholder="Username") }}</p>
+            <p>{{ form.password(placeholder="Password") }}</p>
+            <p>{{ form.submit() }}</p>
+            <p class="signup">
+                Don't have an account?
+                <a href="{{ url_for('register') }}">Sign Up</a>
+            </p>
+        </form>
+    </div>
 
-    <form method="POST">
-        <p>
-            {{ form.username(placeholder="Username") }}
-        </p>
-        <p>
-            {{ form.password(placeholder="Password") }}
-        </p>
-        <p>
-            {{ form.submit() }}
-        </p>
-    </form>
 
 {% endblock %}

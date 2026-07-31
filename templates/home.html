@@ -9,29 +9,39 @@
             <a href="#">Browse</a>
             <a href="#">Upload</a>
             <a href="#">Favourites</a>
-            <a href="{{ url_for('login') }}" class="login-btn">Log in</a>
+            <a href="{{ url_for('login') }}" class="sidelogin-btn">Log in</a>
         </nav>
     </header>
 
-    <h1>Search Recipes</h1>
-
-    <form action="{{ url_for('home') }}" method="GET">
-        <input
-            type="text"
-            name="query"
-            value="{{ query }}"
-            placeholder="Search recipes">
-        <button type="submit">Search</button>
-    </form>
+    <div class="hero-container">
+        <div class="hero-overlay">
+            <h1>Discover your next meal</h1>
+            <form action="{{ url_for('home') }}" method="GET" class="search-form">
+                <input
+                    type="text"
+                    name="query"
+                    value="{{ query }}"
+                    placeholder="Search recipes">
+            </form>
+        </div>
+    </div>
 
     <hr>
 
-    <h2>Results</h2>
+    <div class="recipe-cards">
+        <section class="results-title">
+            <h2>Results</h2>
+        </section>
 
-    {% for recipe in recipes %}
-        <div>
-            <h3>{{ recipe.title }}</h3>
-            <img src="{{ recipe.image }}" width="150">
-        </div>
-{% endfor %}
+        <section class="three-card-container">
+            {% for recipe in recipes %}
+            <div>
+                <h3>{{ recipe.title }}</h3>
+                <img src="{{ recipe.image }}" width="150" href="{{ url_for('recipe') }}">
+            </div>
+            {% endfor %}
+        </section>
+        
+    </div>
+
 {% endblock %}

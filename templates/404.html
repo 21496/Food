@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/static/styles.css">
+    <title>Page Not Found - 404</title>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo">
+            <a link href="/" class="title">Reciped</a>
+        </div>
+
+        <nav>
+            <a href="{{ url_for('login') }}" class="sidelogin-btn">Log in</a>
+        </nav>
+    </header>
+
+    <div class="error-container"><h1>Oops! Page Not Found (404)</h1>
+        <p>The page you are looking for might have been removed or is temporarily unavailable.</p>
+        <p><a href="/">Return to Home Page</a></p>
+    </div>
+    
+</body>
+</html>

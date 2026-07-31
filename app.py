@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
-from wtforms.validators import DataRequired, Length
+from wtforms.validators import DataRequired, Length, EqualTo
 from werkzeug.security import generate_password_hash, check_password_hash
 
 load_dotenv()
@@ -53,8 +53,21 @@ class RegisterForm(FlaskForm):
     password = PasswordField(
         "Password",
         validators=[DataRequired(), Length(min=6)])
+
+    confirm_password = PasswordField(
+        "Confirm Password",
+        validators=[
+            DataRequired(),
+            EqualTo("password", message="Passwords must match.")])
     submit = SubmitField("Register")
 
+
+@app.route("/")
+def home():
+    query = request.args.get("query", "chicken")
+    data = search_recipes(query)
+    recipes = data.get("results", [])
+    return render_template("home.html", recipes = recipes, query = query)
 
 def search_recipes(query):
     url = "https://api.spoonacular.com/recipes/complexSearch"
@@ -67,14 +80,6 @@ def search_recipes(query):
 
     response = requests.get(url, params=params)
     return response.json()
-
-
-@app.route("/")
-def home():
-    query = request.args.get("query", "chicken")
-    data = search_recipes(query)
-    recipes = data.get("results", [])
-    return render_template("home.html", recipes = recipes, query = query)
 
 
 
@@ -146,6 +151,10 @@ def register():
     return render_template(
         "register.html",
         form=form)
+
+@app.errorhandler(404)
+def page_not_found(error):
+    return render_template('404.html'), 404
 
 
 if __name__ == '__main__':

@@ -59,10 +59,69 @@ nav a:hover {
     transition: all 0.25s ease;
 }
 
-.login-btn:hover {
+.sidelogin-btn:hover {
     background: #454545;
     border-color: #7a7a7a;
 }
+
+.profile-dropdown summary {
+    list-style: none;
+    cursor: pointer;
+}
+
+.profile-dropdown summary::-webkit-details-marker {
+    display: none;
+}
+
+.profile-dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.profile-icon {
+    width: 45px;
+    height: 45px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #f26b2f;
+    color: white;
+    border-radius: 50%;
+    font-size: 20px;
+    font-weight: 600;
+    user-select: none;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    top: 55px;
+    right: 0;
+    min-width: 140px;
+    background: #3a3a3a;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 6px 15px rgba(0,0,0,.3);
+    z-index: 1000;
+}
+
+.profile-dropdown[open] .dropdown-content {
+    display: block;
+}
+
+.dropdown-content a {
+    display: block;
+    padding: 12px 18px;
+    color: white;
+    text-decoration: none;
+    transition: background .2s;
+}
+
+.dropdown-content a:hover {
+    background: #4a4a4a;
+}
+
+
 
 /* Home page */
 
@@ -295,14 +354,11 @@ input:focus{
     padding-bottom:12px;
 }
 
-
 .method ol{
     list-style:none;
     padding:0;
     counter-reset:step;
 }
-
-
 
 .method li{
     counter-increment:step;
@@ -318,7 +374,27 @@ input:focus{
     box-shadow:0 3px 8px rgba(0,0,0,.2);
 }
 
-/* 404 page */
+/* profile icon */
+.profile-icon{
+    width:45px;
+    height:45px;
+    background:#f26b2f;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    color:white;
+    text-decoration:none;
+    font-size:20px;
+    font-weight:600;
+    transition:.3s;
+}
+
+.profile-icon:hover{
+    transform:scale(1.08);
+}
+
+/* error page */
 
 .error-container { 
     font-family: sans-serif;
@@ -337,8 +413,18 @@ p {
     color: #666;
 }
 
-a { 
+.return {
+    display: inline-block;
+    margin-top: 35px;
     color: #ff6b35;
+    font-size: 22px;
+    font-weight: 700;
     text-decoration: none;
-    font-weight: bold;
+    transition: all 0.25s ease;
+}
+
+.return:hover {
+    color: #ff8c5a;
+    text-decoration: underline;
+    transform: translateY(-1px);
 }

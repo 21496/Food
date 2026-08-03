@@ -1,6 +1,6 @@
 import os
 import requests
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, abort, session
 from flask_sqlalchemy import SQLAlchemy
 from dotenv import load_dotenv
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
@@ -29,6 +29,12 @@ class User(db.Model, UserMixin):
     id = db.Column(db.Integer, primary_key=True)
     username = db.Column(db.String(100), unique=True, nullable=False)
     password = db.Column(db.String(200), nullable=False)
+
+class Favourite(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    recipe_id = db.Column(db.String(50), nullable=False)
+
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -65,8 +71,12 @@ class RegisterForm(FlaskForm):
 @app.route("/")
 def home():
     query = request.args.get("query", "chicken")
-    data = search_recipes(query)
-    recipes = data.get("results", [])
+    if session.get("skip_api"):
+        recipes = []
+        session.pop("skip_api")
+    else:
+        data = search_recipes(query)
+        recipes = data.get("results", [])
     return render_template("home.html", recipes = recipes, query = query)
 
 def search_recipes(query):
@@ -79,14 +89,27 @@ def search_recipes(query):
     }
 
     response = requests.get(url, params=params)
+    if response.status_code != 200:
+        abort(500)
     return response.json()
 
+@app.route("/favourites")
+@login_required
+def favourites():
+
+    favourites = Favourite.query.filter_by(user_id=current_user.id).all()
+    return render_template("favourites.html", favourites=favourites)
+
+@app.route("/upload")
+@login_required
+def upload():
+    return render_template("upload.html")
 
 
 @app.route("/recipe/<int:recipe_id>")
 def recipe(recipe_id):
     recipe = get_recipe(recipe_id)
-    return render_template("recipe.html", recipe=recipe)
+    return render_template("recipe.html", recipe=recipe,)
 
 def get_recipe(recipe_id):
     url = f"https://api.spoonacular.com/recipes/{recipe_id}/information"
@@ -97,6 +120,8 @@ def get_recipe(recipe_id):
     }
 
     response = requests.get(url, params=params)
+    if response.status_code != 200:
+            abort(503)
     return response.json()
 
 
@@ -122,6 +147,12 @@ def login():
         form=form
     )
 
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    return redirect(url_for("home"))
+
 @app.route("/register", methods=["GET", "POST"])
 def register():
 
@@ -130,21 +161,16 @@ def register():
         existing_user = User.query.filter_by(
             username=form.username.data
         ).first()
-
         if existing_user:
             flash("Username already exists")
             return redirect(url_for("register"))
-
         hashed_password = generate_password_hash(
             form.password.data)
-        
         new_user = User(
             username=form.username.data,
             password=hashed_password)
-
         db.session.add(new_user)
         db.session.commit()
-
         flash("Account created successfully!")
         return redirect(url_for("login"))
 
@@ -156,6 +182,10 @@ def register():
 def page_not_found(error):
     return render_template('404.html'), 404
 
+@app.errorhandler(500)
+def internal_error(error):
+    session["skip_api"] = True
+    return render_template("500.html"), 500
 
 if __name__ == '__main__':
     with app.app_context():

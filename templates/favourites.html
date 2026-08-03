@@ -1,0 +1,28 @@
+{% extends 'layout.html' %}
+{% block content %}
+    <header class="navbar">
+        <div class="logo">
+            <a href="/" class="title">Reciped</a>
+        </div>
+
+        <nav>
+            <a href="{{ url_for('home') }}">Browse</a>
+            <a href="{{ url_for('upload') }}">Upload</a>
+            <a href="{{ url_for('favourites') }}">Favourites</a>
+            <details class="profile-dropdown">
+                <summary class="profile-icon">
+                    {{ current_user.username[0]|upper }}
+                </summary>
+                <div class="dropdown-content">
+                    <a href="{{ url_for('logout') }}">Log Out</a>
+                </div>
+            </details>
+        </nav>
+    </header>
+
+    <div class="favourites-container">
+        <h1>{{ current_user.username }}'s Favourite Recipes</h1>
+        <p>You haven't saved any recipes yet.</p>
+    </div>
+
+{% endblock %}

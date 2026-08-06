@@ -1,10 +1,12 @@
 import os
 import requests
+import time
 from flask import Flask, render_template, request, redirect, url_for, flash, abort, session
 from flask_sqlalchemy import SQLAlchemy
-from dotenv import load_dotenv
 from flask_login import LoginManager, UserMixin, login_user, login_required, logout_user, current_user
 from flask_wtf import FlaskForm
+from flask_caching import Cache
+from dotenv import load_dotenv
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length, EqualTo
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -16,7 +18,7 @@ app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///recipes.db'
 app.secret_key = os.getenv("SECRET_KEY")
 db = SQLAlchemy(app)
-
+cache = Cache(app, config={"CACHE_TYPE": "SimpleCache"})
 
 login_manager = LoginManager()
 login_manager.init_app(app)
@@ -68,30 +70,78 @@ class RegisterForm(FlaskForm):
     submit = SubmitField("Register")
 
 
+
+
 @app.route("/")
 def home():
-    query = request.args.get("query", "chicken")
-    if session.get("skip_api"):
+    query = request.args.get("query")
+    mode = request.args.get("mode", "popular")
+    disabled_until = session.get("api_disabled_until")
+    if disabled_until and time.time() < disabled_until:
         recipes = []
-        session.pop("skip_api")
-    else:
-        data = search_recipes(query)
-        recipes = data.get("results", [])
-    return render_template("home.html", recipes = recipes, query = query)
 
+    else:
+        session.pop("api_disabled_until", None)
+        if query:
+            data = search_recipes(query)
+            recipes = data.get("results", [])
+
+        elif mode == "random":
+            data = get_random_recipes()
+            recipes = data.get("recipes", [])
+
+        else:
+            data = get_popular_recipes()
+            recipes = data.get("results", [])
+    return render_template("home.html", recipes = recipes, query = query, mode = mode)
+
+@cache.memoize(timeout=300)
 def search_recipes(query):
     url = "https://api.spoonacular.com/recipes/complexSearch"
 
     params = {
         "apiKey": api_key,
         "query": query,
-        "number": 20
+        "number": 20,
+        "addRecipeInformation": True
     }
 
     response = requests.get(url, params=params)
     if response.status_code != 200:
-        abort(500)
+        abort(503)
     return response.json()
+
+@cache.memoize(timeout=300)
+def get_popular_recipes():
+    url = "https://api.spoonacular.com/recipes/complexSearch"
+
+    params = {
+        "apiKey": api_key,
+        "number": 20,
+        "sort": "popularity",
+        "type": "main course",
+        "addRecipeInformation": True
+    }
+
+    response = requests.get(url, params=params)
+    if response.status_code != 200:
+        abort(503)
+    return response.json()
+
+def get_random_recipes():
+    url = "https://api.spoonacular.com/recipes/random"
+
+    params = {
+        "apiKey": api_key,
+        "number": 20,
+    }
+
+    response = requests.get(url, params=params)
+    if response.status_code != 200:
+        abort(503)
+    return response.json()
+
+
 
 @app.route("/favourites")
 @login_required
@@ -108,9 +158,16 @@ def upload():
 
 @app.route("/recipe/<int:recipe_id>")
 def recipe(recipe_id):
+    disabled_until = session.get("api_disabled_until")
+    if disabled_until and time.time() < disabled_until:
+        return redirect(url_for("home"))
+    else:
+        session.pop("api_disabled_until", None)
     recipe = get_recipe(recipe_id)
     return render_template("recipe.html", recipe=recipe,)
 
+
+@cache.memoize(timeout=300)
 def get_recipe(recipe_id):
     url = f"https://api.spoonacular.com/recipes/{recipe_id}/information"
 
@@ -119,11 +176,13 @@ def get_recipe(recipe_id):
         "includeNutrition": False
     }
 
-    response = requests.get(url, params=params)
-    if response.status_code != 200:
+    try:
+        response = requests.get(url, params=params, timeout=10)
+        if response.status_code != 200:
             abort(503)
-    return response.json()
-
+        return response.json()
+    except requests.exceptions.RequestException:
+        abort(503)
 
 
 @app.route("/login", methods=["GET", "POST"])
@@ -182,10 +241,10 @@ def register():
 def page_not_found(error):
     return render_template('404.html'), 404
 
-@app.errorhandler(500)
-def internal_error(error):
-    session["skip_api"] = True
-    return render_template("500.html"), 500
+@app.errorhandler(503)
+def service_unavailable(error):
+    session["api_disabled_until"] = time.time() + 600  # 10 minutes
+    return render_template("503.html"), 503
 
 if __name__ == '__main__':
     with app.app_context():

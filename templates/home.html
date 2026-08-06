@@ -38,6 +38,14 @@
                     value="{{ query }}"
                     placeholder="Search recipes">
             </form>
+            <div class="recipe-options">
+                <a href="{{ url_for('home') }}" class="hero-btn">
+                    Most Popular
+                </a>
+                <a href="{{ url_for('home', mode='random') }}" class="hero-btn">
+                    Random Recipes
+                </a>
+            </div>
         </div>
     </div>
 
@@ -45,24 +53,42 @@
 
     <div class="recipe-cards">
         <section class="results-title">
-            <h2>Results</h2>
+            <h2>Trending Recipes</h2>
         </section>
 
         <section class="three-card-container">
             {% for recipe in recipes %}
             <div class="recipe-card">
                 <a href="{{ url_for('recipe', recipe_id=recipe.id) }}">
-                    <img src="{{ recipe.image }}" width="150">
+                    <img src="{{ recipe.image }}">
                 </a>
-                <h3>
-                    <a href="{{ url_for('recipe', recipe_id=recipe.id) }}">
-                        {{ recipe.title }}
-                    </a>
-                </h3>
+                <div class="recipe-info">
+                    <h3>
+                        <a href="{{ url_for('recipe', recipe_id=recipe.id) }}">
+                            {{ recipe.title }}
+                        </a>
+                    </h3>
+                    <div class="recipe-meta">
+                        {% if recipe.readyInMinutes %}
+                        <span>⏱ {{ recipe.readyInMinutes }} mins</span>
+                        {% endif %}
+
+                        {% if recipe.aggregateLikes %}
+                        <span>⭐ {{ recipe.aggregateLikes }}</span>
+                        {% endif %}
+                    </div>
+                    <div class="recipe-tags">
+                        {% if recipe.cuisines %}
+                            <span>{{ recipe.cuisines[0] }}</span>
+
+                        {% elif recipe.dishTypes %}
+                            <span>{{ recipe.dishTypes[0]|title }}</span>
+                        {% endif %}
+                    </div>
+                </div>
             </div>
             {% endfor %}
         </section>
-        
     </div>
 
 {% endblock %}

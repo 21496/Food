@@ -20,9 +20,48 @@
         </nav>
     </header>
 
-    <div class="favourites-container">
-        <h1>{{ current_user.username }}'s Favourite Recipes</h1>
-        <p>You haven't saved any recipes yet.</p>
+    <div class="favourites-page">
+
+    <div class="favourites-header">
+        <h1>My Favourites</h1>
+        <p>Recipes you've saved for later.</p>
     </div>
 
+    {% if recipes %}
+        <div class="favourites-grid">
+            {% for recipe in recipes %}
+
+                <a href="{{ url_for('recipe', recipe_id=recipe.id) }}"
+                   class="favourite-card">
+                    <div class="favourite-recipe-image">
+                        <img src="{{ recipe.image }}" alt="{{ recipe.title }}">
+                    </div>
+                    <div class="favourite-card-content">
+                        <h2>{{ recipe.title }}</h2>
+                        <div class="favourite-recipe-info">
+                                <span>
+                                    {{ recipe.readyInMinutes }} mins
+                                </span>
+                                <span>
+                                    Serves {{ recipe.servings }}
+                                </span>
+                                <span class="favourite-card-score">
+                                    ★ {{ recipe.spoonacularScore | round(1) }}
+                                </span>
+                        </div>
+                    </div>
+                </a>
+            {% endfor %}
+        </div>
+
+    {% else %}
+        <div class="no-favourites">
+            <h1>Your favourites</h1>
+            <p>{{ recipes|length }} saved recipes</p>
+            <a href="{{ url_for('home') }}" class="browse-btn">
+                Browse Recipes
+            </a>
+        </div>
+    {% endif %}
+</div>
 {% endblock %}

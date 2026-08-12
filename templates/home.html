@@ -60,7 +60,13 @@
             {% for recipe in recipes %}
             <div class="recipe-card">
                 <a href="{{ url_for('recipe', recipe_id=recipe.id) }}">
-                    <img src="{{ recipe.image }}">
+                    {% if recipe.image %}
+                        <img src="{{ recipe.image }}">
+                    {% else %}
+                        <div class="no-image">
+                            No Image
+                        </div>
+                    {% endif %}
                 </a>
                 <div class="recipe-info">
                     <h3>

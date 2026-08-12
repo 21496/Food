@@ -32,21 +32,43 @@
         <div class="image-section">
             <img src="{{ recipe.image }}">
         </div>
-        <div class="info-section">
+        <div class="recipe-details">
             <h1>{{ recipe.title }}</h1>
+            <div class="info-section">
+                <div class="stats">
+                    <div class="stat">
+                        {{ recipe.readyInMinutes }} Mins
+                    </div>
+                    <div class="stat">
+                        Serves {{ recipe.servings }}
+                    </div>
+                    <div class="stat">
+                        <span class="star">★</span>
+                        {{ recipe.spoonacularScore | round(1) }}
+                    </div>
+                </div>
 
-            <div class="recipe-info">
-                {{ recipe.readyInMinutes }} Mins
-                Serves {{ recipe.servings }}
-                Likes
-                {{ recipe.author }}
+                {% if not current_user.is_authenticated %}
+                <a href="{{ url_for('login') }}" class="save-btn">
+                    Login to save
+                </a>
 
-                {{ recipe.dishtypes }}
+                {% elif is_favourite %}
+                    <form action="{{ url_for('favourite', recipe_id=recipe.id) }}" method="POST">
+                        <button type="submit" class="save-btn">
+                            Remove from favourites
+                        </button>
+                    </form>
 
+                {% else %}
+                    <form action="{{ url_for('favourite', recipe_id=recipe.id) }}" method="POST">
+                        <button type="submit" class="save-btn">
+                            Save to favourites
+                        </button>
+                    </form>
+
+                {% endif %}
             </div>
-            <button class="save-btn">
-                Save to favourites
-            </button>
         </div>
     </div>  
 

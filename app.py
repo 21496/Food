@@ -36,12 +36,11 @@ class Favourite(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     recipe_id = db.Column(db.String(50), nullable=False)
-
+    __table_args__ = (db.UniqueConstraint("user_id", "recipe_id", name="unique_user_recipe"))
 
 @login_manager.user_loader
 def load_user(user_id):
     return User.query.get(int(user_id))
-
 
 class LoginForm(FlaskForm):
     username = StringField(
@@ -68,7 +67,6 @@ class RegisterForm(FlaskForm):
             DataRequired(),
             EqualTo("password", message="Passwords must match.")])
     submit = SubmitField("Register")
-
 
 
 
@@ -146,9 +144,39 @@ def get_random_recipes():
 @app.route("/favourites")
 @login_required
 def favourites():
+    favourite_rows = Favourite.query.filter_by(user_id=current_user.id).all()
+    recipes = []
+    for favourite in favourite_rows:
+        try:
+            recipe = get_recipe(favourite.recipe_id)
+            if recipe:
+                recipes.append(recipe)
+        except Exception:
+            continue
 
-    favourites = Favourite.query.filter_by(user_id=current_user.id).all()
-    return render_template("favourites.html", favourites=favourites)
+    return render_template("favourites.html",recipes=recipes)
+
+@app.route("/favourite/<int:recipe_id>", methods=["POST"])
+@login_required
+def favourite(recipe_id):
+
+    existing_favourite = Favourite.query.filter_by(
+        user_id=current_user.id,
+        recipe_id=str(recipe_id)
+    ).first()
+
+    if existing_favourite:
+        db.session.delete(existing_favourite)
+        db.session.commit()
+
+    else:
+        new_favourite = Favourite(user_id=current_user.id,recipe_id=str(recipe_id))
+        db.session.add(new_favourite)
+        db.session.commit()
+
+    return redirect(
+        request.referrer or url_for("home")
+    )
 
 @app.route("/upload")
 @login_required
@@ -161,10 +189,18 @@ def recipe(recipe_id):
     disabled_until = session.get("api_disabled_until")
     if disabled_until and time.time() < disabled_until:
         return redirect(url_for("home"))
-    else:
-        session.pop("api_disabled_until", None)
+    session.pop("api_disabled_until", None)
+
     recipe = get_recipe(recipe_id)
-    return render_template("recipe.html", recipe=recipe,)
+    is_favourite = False
+
+    if current_user.is_authenticated:
+        is_favourite = Favourite.query.filter_by(
+            user_id=current_user.id,
+            recipe_id=str(recipe_id)
+        ).first() is not None
+
+    return render_template("recipe.html", recipe=recipe, is_favourite=is_favourite)
 
 
 @cache.memoize(timeout=300)

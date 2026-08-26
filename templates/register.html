@@ -34,10 +34,10 @@
             <h1>Create Account</h1>
             
             <p class="subtitle">Log in to save favourites and share your reipces</p>
-            <p>{{ form.username(placeholder="Username") }}</p>
-            <p>{{ form.password(placeholder="Password") }}</p>
-            <p>{{ form.confirm_password(placeholder="Confirm Password") }}</p>
-            <p>{{ form.submit() }}</p>
+            <p>{{ form.username(class="login_input", placeholder="Username") }}</p>
+            <p>{{ form.password(class="login_input", placeholder="Password") }}</p>
+            <p>{{ form.confirm_password(class="login_input", placeholder="Confirm Password") }}</p>
+            <p>{{ form.submit(class="login_input") }}</p>
             <p class="signup">
                 Already have an account?
                 <a href="{{ url_for('login') }}">Log in</a>

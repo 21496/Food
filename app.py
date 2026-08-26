@@ -10,6 +10,7 @@ from dotenv import load_dotenv
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import DataRequired, Length, EqualTo
 from werkzeug.security import generate_password_hash, check_password_hash
+from werkzeug.utils import secure_filename
 
 load_dotenv()
 
@@ -36,7 +37,17 @@ class Favourite(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
     recipe_id = db.Column(db.String(50), nullable=False)
-    __table_args__ = (db.UniqueConstraint("user_id", "recipe_id", name="unique_user_recipe"))
+    __table_args__ = (db.UniqueConstraint("user_id", "recipe_id", name="unique_user_recipe"),)
+
+class UserRecipe(db.Model):
+    id = db.Column(db.Integer, primary_key=True)
+    user_id = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    name = db.Column(db.String(150), nullable=False)
+    cuisine = db.Column(db.String(50), nullable=False)
+    cook_time = db.Column(db.String(50), nullable=False)
+    image = db.Column(db.String(300))
+    ingredients = db.Column(db.Text, nullable=False)
+    method = db.Column(db.Text, nullable=False)
 
 @login_manager.user_loader
 def load_user(user_id):
@@ -154,7 +165,10 @@ def favourites():
         except Exception:
             continue
 
-    return render_template("favourites.html",recipes=recipes)
+    uploaded_recipes = UserRecipe.query.filter_by(
+        user_id=current_user.id).all()
+    
+    return render_template("favourites.html",recipes=recipes, uploaded_recipes=uploaded_recipes)
 
 @app.route("/favourite/<int:recipe_id>", methods=["POST"])
 @login_required
@@ -178,14 +192,70 @@ def favourite(recipe_id):
         request.referrer or url_for("home")
     )
 
-@app.route("/upload")
+@app.route("/uploaded-recipe/<int:recipe_id>")
+@login_required
+def uploaded_recipe(recipe_id):
+    recipe = UserRecipe.query.get_or_404(recipe_id)
+
+    if recipe.user_id != current_user.id:
+        abort(404)
+
+    return render_template("recipe.html", recipe=recipe, uploaded=True, is_favourite=False)
+
+@app.route("/upload", methods=["GET", "POST"])
 @login_required
 def upload():
+    if request.method == "POST":
+        recipe_name = request.form.get("recipe_name")
+        cuisine = request.form.get("cuisine")
+        cook_time = request.form.get("cook_time")
+        method = request.form.get("method")
+        quantities = request.form.getlist("quantity[]")
+        ingredients = request.form.getlist("ingredient[]")
+        recipe_ingredients = []
+        for quantity, ingredient in zip(quantities, ingredients):
+            if ingredient.strip():
+                recipe_ingredients.append(
+                    f"{quantity} {ingredient}".strip()
+                )
+
+        image = request.files.get("recipe_image")
+        image_filename = secure_filename(image.filename)
+
+        if image and image.filename:
+            upload_folder = os.path.join(
+                app.root_path,
+                "static",
+                "uploads"
+            )
+
+            os.makedirs(upload_folder, exist_ok=True)
+            image_filename = image.filename
+            image.save(
+                os.path.join(upload_folder, image_filename)
+            )
+
+        new_recipe = UserRecipe(user_id=current_user.id, name=recipe_name, 
+            cuisine=cuisine, cook_time=cook_time, image=image_filename,
+            ingredients="\n".join(recipe_ingredients), method=method)
+        
+        db.session.add(new_recipe)
+        db.session.commit()
+        return redirect(url_for("home"))
     return render_template("upload.html")
 
 
 @app.route("/recipe/<int:recipe_id>")
 def recipe(recipe_id):
+    uploaded_recipe = UserRecipe.query.get(recipe_id)
+
+    if uploaded_recipe:
+        return render_template(
+            "recipe.html",
+            recipe=uploaded_recipe,
+            uploaded=True,
+            is_favourite=False
+            )
     disabled_until = session.get("api_disabled_until")
     if disabled_until and time.time() < disabled_until:
         return redirect(url_for("home"))

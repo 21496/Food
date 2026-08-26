@@ -28,8 +28,114 @@
         </nav>
     </header>
 
-    <h3>Upload page, not done yet</h3>
+    <div class="upload-page">
+        <h1>Share a recipe</h1>
 
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label for="recipe_name">Recipe name</label>
 
-    
+                <input type="text" id="recipe_name" name="recipe_name" placeholder="e.g. Grandma's tomato soup" required>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="cuisine">Cuisine</label>
+
+                    <select id="cuisine" name="cuisine" required>
+                        <option value="" disabled selected>Select...</option>
+                        <option value="Italian">Italian</option>
+                        <option value="Mexican">Mexican</option>
+                        <option value="Indian">Indian</option>
+                        <option value="Chinese">Chinese</option>
+                        <option value="Japanese">Japanese</option>
+                        <option value="American">American</option>
+                        <option value="French">French</option>
+                        <option value="Greek">Greek</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="form-group">
+                    <label for="cook_time">Cook time</label>
+                    <input type="text" id="cook_time" name="cook_time" placeholder="e.g. 30 min" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="recipe_image">Photo</label>
+
+                <label for="recipe_image" class="upload-box">
+                    <span class="upload-icon">📷</span>
+                    <span>Click to upload</span>
+                </label>
+                <input type="file" id="recipe_image" name="recipe_image" accept="image/*" hidden>
+            </div>
+
+            <div class="form-group">
+                <label>Ingredients</label>
+                <div id="ingredients">
+                    <div class="ingredient-row">
+
+                        <input type="text" name="quantity[]" placeholder="Qty">
+                        <input type="text" name="ingredient[]" placeholder="Ingredient name">
+
+                        <button type="button" class="add-btn" onclick="addIngredient()"> + Add </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+
+                <label for="method">Method</label>
+                <textarea id="method" name="method" placeholder="Describe your cooking steps..." required></textarea>
+            </div>
+
+            <button type="submit" class="publish-btn">
+                Publish recipe
+            </button>
+
+        </form>
+    </div>
+
+    <script>
+
+    function addIngredient() {
+
+        const ingredients = document.getElementById("ingredients");
+
+        const row = document.createElement("div");
+
+        row.className = "ingredient-row";
+
+        row.innerHTML = `
+            <input
+                type="text"
+                name="quantity[]"
+                placeholder="Qty"
+            >
+
+            <input
+                type="text"
+                name="ingredient[]"
+                placeholder="Ingredient name"
+            >
+
+            <button
+                type="button"
+                class="remove-btn"
+                onclick="removeIngredient(this)"
+            >
+                Remove
+            </button>
+        `;
+
+        ingredients.appendChild(row);
+    }
+
+    function removeIngredient(button) {
+        button.parentElement.remove();
+    }
+    </script>
+
 {% endblock %}

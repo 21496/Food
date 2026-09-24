@@ -121,7 +121,48 @@ nav a:hover {
     background: #4a4a4a;
 }
 
+/* Footer */
 
+.site-footer {
+    text-align: center;
+    padding: 30px 16px;
+    font-size: 14px;
+    color: #777;
+    border-top: 1px solid #444;
+    margin-top: 50px;
+}
+
+.site-footer a {
+    color: #999;
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.site-footer a:hover {
+    color: #ff6b35;
+    text-decoration: underline;
+}
+
+/* Recipe credit */
+
+.recipe-source {
+    margin-top: 18px;
+    color: #888;
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.recipe-source a {
+    color: #aaa;
+    text-decoration: none;
+    font-weight: 500;
+    transition: color 0.2s ease;
+}
+
+.recipe-source a:hover {
+    color: #ff6b35;
+    text-decoration: underline;
+}
 
 /* Home page */
 
@@ -803,6 +844,25 @@ nav a:hover {
 .publish-btn:hover {
     background: #3a3a3a;
     border-color: #777;
+}
+
+.toast {
+    position: fixed;
+    bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%) translateY(20px);
+    background: #ff6b35;
+    color: #fff;
+    padding: 12px 20px;
+    border-radius: 8px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
 }
 
 /* error page */

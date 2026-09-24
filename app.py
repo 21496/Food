@@ -23,6 +23,12 @@ load_dotenv()
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///recipes.db'
+
+# Only these image types can be uploaded
+ALLOWED_EXTENSIONS = {"png", "jpg", "jpeg", "gif", "webp"}
+app.config["MAX_CONTENT_LENGTH"] = 5 * 1024 * 1024
+
+
 app.secret_key = os.getenv("SECRET_KEY")
 db = SQLAlchemy(app)
 
@@ -242,6 +248,11 @@ def uploaded_recipe(recipe_id):
     return render_template("recipe.html", recipe=user_recipe, uploaded=True, is_favourite=False)
 
 
+def allowed_file(filename):
+    """Return True if the file name ends with an allowed image extension"""
+    return "." in filename and filename.rsplit(".", 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
 @app.route("/upload", methods=["GET", "POST"])
 @login_required
 def upload():
@@ -263,18 +274,28 @@ def upload():
                 )
 
         image = request.files.get("recipe_image")
-        image_filename = secure_filename(image.filename)
-
+        image_filename = None
+ 
         # Only save an image if one was actaully chosen
         if image and image.filename:
+            # secure_filename removes unsafe characters from the file name
+            safe_name = secure_filename(image.filename)
+ 
+            # Reject anything that is not an allowed image type
+            if not allowed_file(safe_name):
+                flash("Only PNG, JPG, JPEG, GIF or WEBP images are allowed")
+                return redirect(url_for("upload"))
+ 
+            # Prefix with user id and time so files with the same name don't overwrite each other
+            image_filename = f"{current_user.id}_{int(time.time())}_{safe_name}"
+ 
             upload_folder = os.path.join(
                 app.root_path,
                 "static",
                 "uploads"
             )
-
+ 
             os.makedirs(upload_folder, exist_ok=True)
-            image_filename = image.filename
             image.save(
                 os.path.join(upload_folder, image_filename)
             )
@@ -404,6 +425,13 @@ def register():
 def page_not_found(_error):
     """Show the custom 404 page when a page is not found"""
     return render_template('404.html'), 404
+
+
+@app.errorhandler(413)
+def file_too_large(_error):
+    """Tell the user when an upload is over the 5 MB limit and send them back to the form"""
+    flash("That file is too large. The limit is 5 MB.")
+    return redirect(url_for("upload"))
 
 
 @app.errorhandler(503)

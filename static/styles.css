@@ -123,13 +123,14 @@ nav a:hover {
 
 /* Footer */
 
+
 .site-footer {
     text-align: center;
     padding: 30px 16px;
     font-size: 14px;
     color: #777;
     border-top: 1px solid #444;
-    margin-top: 50px;
+    margin-top: auto;
 }
 
 .site-footer a {
@@ -146,7 +147,8 @@ nav a:hover {
 /* Recipe credit */
 
 .recipe-source {
-    margin-top: 18px;
+    margin-top: 20px;
+    margin-bottom: 40px;
     color: #888;
     font-size: 14px;
     line-height: 1.5;

@@ -275,26 +275,21 @@ def upload():
 
         image = request.files.get("recipe_image")
         image_filename = None
- 
         # Only save an image if one was actaully chosen
         if image and image.filename:
             # secure_filename removes unsafe characters from the file name
             safe_name = secure_filename(image.filename)
- 
             # Reject anything that is not an allowed image type
             if not allowed_file(safe_name):
                 flash("Only PNG, JPG, JPEG, GIF or WEBP images are allowed")
                 return redirect(url_for("upload"))
- 
             # Prefix with user id and time so files with the same name don't overwrite each other
             image_filename = f"{current_user.id}_{int(time.time())}_{safe_name}"
- 
             upload_folder = os.path.join(
                 app.root_path,
                 "static",
                 "uploads"
             )
- 
             os.makedirs(upload_folder, exist_ok=True)
             image.save(
                 os.path.join(upload_folder, image_filename)
@@ -446,3 +441,4 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
     app.run(debug=True)
+
